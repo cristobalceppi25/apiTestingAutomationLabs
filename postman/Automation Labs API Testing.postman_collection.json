@@ -1,0 +1,626 @@
+{
+  "info": {
+    "_postman_id": "3374227a-8e72-4315-8486-f19c1a39fd0b",
+    "name": "Automation Labs API Testing",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "57771027",
+    "_collection_link": "https://go.postman.co/collection/57771027-3374227a-8e72-4315-8486-f19c1a39fd0b?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01 - Autenticación",
+      "item": [
+        {
+          "name": "AUTH-001 - Login con credenciales válidas",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"La respuesta es JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test('el email es correcto', function(){\r\n    pm.expect(jsonData.data.user.email).to.be.eql(pm.variables.get(\"email_login\"))\r\n})\r\n\r\npm.test('La respuesta tiene un accessToken', function(){\r\n    pm.expect(jsonData.data).to.have.property('accessToken')\r\n})\r\n\r\npm.test('el accessToken es un string', function(){\r\n    pm.expect(jsonData.data.accessToken).to.be.a(\"string\").and.not.empty\r\n})\r\n\r\npm.test('La respuesta tiene un refreshToken', function(){\r\n    pm.expect(jsonData.data).to.have.property('refreshToken')\r\n})\r\n\r\npm.test('el refreshToken es un string', function(){\r\n    pm.expect(jsonData.data.refreshToken).to.be.a(\"string\").and.not.empty\r\n})\r\n\r\npm.environment.set(\"accessToken\", jsonData.data.accessToken)\r\npm.environment.set(\"refreshToken\", jsonData.data.refreshToken)"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{email_login}}\",\r\n  \"password\": \"{{password_login}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/login",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-002 - Login con email inexistente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\n\r\npm.test('status code 401', function() {\r\n    pm.response.to.have.status(401)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"no.existe@example.com\",\r\n  \"password\": \"{{password_login}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/login",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-003 - Login sin email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\n\r\npm.test(\"El email es requerido\", () => {\r\n    pm.expect(emailError).to.exist;\r\n    pm.expect(emailError.message).to.eql(\"email is required\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"password\": \"{{password_login}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/login",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-004 - Login sin contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst passwordError = jsonData.error.details.find(\r\n    detail => detail.field === \"password\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\n\r\npm.test(\"La contraseña requerida\", () => {\r\n    pm.expect(passwordError).to.exist;\r\n    pm.expect(passwordError.message).to.eql(\"password is required\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{email_login}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/login",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-005 - Login con body vacío",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst passwordError = jsonData.error.details.find(\r\n    detail => detail.field === \"password\"\r\n);\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\npm.test(\"La contraseña requerida\", () => {\r\n    pm.expect(passwordError).to.exist;\r\n    pm.expect(passwordError.message).to.eql(\"password is required\");\r\n});\r\n\r\npm.test(\"El email es requerido\", () => {\r\n    pm.expect(emailError).to.exist;\r\n    pm.expect(emailError.message).to.eql(\"email is required\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/login",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "login"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-006 - Registro con credenciales válidos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\n\r\npm.test('Status code 201', function() {\r\n    pm.response.to.have.status(201)\r\n})\r\n\r\npm.test(\"La respuesta es JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.environment.set(\"accessToken\", jsonData.data.accessToken)\r\n\r\npm.test('Verificar que el nombre e email ingresados sean iguales', function(){\r\n    pm.expect(jsonData.data.name).to.be.eql(pm.variables.get(\"name_register\"))\r\n    pm.expect(jsonData.data.email).to.be.eql(pm.variables.get(\"email_register\"))\r\n})\r\n\r\npm.test('Confirmar que accessToken existe', function(){\r\n    pm.expect(jsonData.data).to.have.property('accessToken')\r\n})\r\n\r\npm.test('Confirmar que los datos de la variables sean correctos', function(){\r\n    pm.expect(jsonData.data.id).to.be.a(\"number\")\r\n    pm.expect(jsonData.data.name).to.be.a(\"string\").and.not.empty\r\n    pm.expect(jsonData.data.email).to.be.a(\"string\").and.not.empty\r\n    pm.expect(jsonData.data.accessToken).to.be.a(\"string\").and.not.empty\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{name_register}}\",\r\n  \"email\": \"{{email_register}}\",\r\n  \"password\": \"{{password_register}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/register",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-007 - Registro con formato de email incorrecto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\n\r\npm.test(\"El formato del email debe ser válido\", () => {\r\n    pm.expect(emailError).to.exist;\r\n    pm.expect(emailError.message).to.eql(\"email must be a valid email\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{name_register}}\",\r\n  \"email\": \"new.user@\",\r\n  \"password\": \"{{password_register}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/register",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-008 - Registro de usuario sin ingresar nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst nameError = jsonData.error.details.find(\r\n    detail => detail.field === \"name\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\n\r\npm.test(\"El nombre es obligatorio\", () => {\r\n    pm.expect(nameError).to.exist;\r\n    pm.expect(nameError.message).to.eql(\"name is required\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{email_register}}\",\r\n  \"password\": \"{{password_register}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/register",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-009 - Registro de usuario sin el email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\n\r\npm.test(\"El email es obligatorio\", () => {\r\n    pm.expect(emailError).to.exist;\r\n    pm.expect(emailError.message).to.eql(\"email is required\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{name_register}}\",\r\n  \"password\": \"{{password_register}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/register",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-010 - Registro de usuario sin la contraseña",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst passwordError = jsonData.error.details.find(\r\n    detail => detail.field === \"password\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\n\r\npm.test(\"La contraseña es obligatoria\", () => {\r\n    pm.expect(passwordError).to.exist;\r\n    pm.expect(passwordError.message).to.eql(\"password is required\");\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{email_register}}\",\r\n  \"name\": \"{{name_register}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/register",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "register"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-011 - Renovar el token con un refreshToken válido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test('Status code 200', function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"Comprobar que la propiedad accessToken existe\", function(){\r\n    pm.expect(jsonData.data).to.have.property(\"accessToken\")\r\n})\r\n\r\npm.test('El antiguo accessToken es distinto al actual accessToken', function(){\r\n    pm.expect(jsonData.data.accessToken).not.to.be.eql(pm.environment.get(\"accessToken\"))\r\n})\r\n\r\npm.test('El accessToken sigue siendo string', function(){\r\n    pm.expect(jsonData.data.accessToken).to.be.a(\"string\").and.not.empty\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"{{refreshToken}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/refresh",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-012 - Renovar el token con un refreshToken inválido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test('Status code 401', function(){\r\n    pm.response.to.have.status(401)\r\n})\r\n\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\n\r\npm.test(\"el codigo de error es INVALID_REFRESH_TOKEN\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"INVALID_REFRESH_TOKEN\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"refreshToken\": \"test\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/refresh",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-013 - Renovar token sin proporcionar refreshToken",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test('Status code 401', function(){\r\n    pm.response.to.have.status(401)\r\n})\r\n\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\n\r\npm.test(\"el codigo de error es INVALID_REFRESH_TOKEN\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"INVALID_REFRESH_TOKEN\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/refresh",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "refresh"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-014 - Ver tu usuario de manera exitosa",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\n\r\npm.test('Status code 200', function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"La respuesta es JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\n\r\npm.test('Verificar que el email sea el mismo que se ingresó antes', function(){\r\n    pm.expect(jsonData.data.email).to.be.eql(pm.variables.get(\"email_login\"))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{accessToken}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_autentificación}}/me",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-015 - No ingresar el bearer token",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test('Status code 401', function(){\r\n    pm.response.to.have.status(401)\r\n})\r\n\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"el codigo de error es UNAUTHORIZED\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"UNAUTHORIZED\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_autentificación}}/me",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "me"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "AUTH-016 - Poder desconectar de forma correcta la cuenta",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test('Status code 200', function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test('La respuesta contiene un mensaje', function() {\r\n    pm.expect(jsonData.data).to.have.property('message')\r\n})\r\n\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_autentificación}}/logout",
+              "host": [
+                "{{url_autentificación}}"
+              ],
+              "path": [
+                "logout"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    }
+  ],
+  "variable": [
+    {
+      "key": "url_autentificación",
+      "value": ""
+    },
+    {
+      "key": "email_login",
+      "value": ""
+    },
+    {
+      "key": "password_login",
+      "value": ""
+    },
+    {
+      "key": "name_register",
+      "value": ""
+    },
+    {
+      "key": "email_register",
+      "value": ""
+    },
+    {
+      "key": "password_register",
+      "value": ""
+    }
+  ]
+}
