@@ -1,5 +1,5 @@
 import { test, expect, request } from '@playwright/test'
-import { userLoginData, apiFinalUrl, userRegisterData, authTokens } from '../../test_data/auth.data';
+import { userLoginData, apiFinalUrl, userRegisterData, authTokens } from '../../test_data/auth.data'
 import type { ValidationErrorResponse } from '../../test_data/auth.types'
 test('AUTH-001 - Login con credenciales válidas', async ({ request }) => {
 
@@ -26,7 +26,7 @@ test('AUTH-001 - Login con credenciales válidas', async ({ request }) => {
 
   authTokens.accessToken = jsonData.data.accessToken
   authTokens.refreshToken = jsonData.data.refreshToken
-});
+})
 
 test('AUTH-002 - Login con email inexistente', async ({ request }) => {
   const response = await request.post(apiFinalUrl.login, {

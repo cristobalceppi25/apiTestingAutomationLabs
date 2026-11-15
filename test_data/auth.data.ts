@@ -14,10 +14,26 @@ export const apiFinalUrl = {
   register: '/v1/auth/register',
   refresh: '/v1/auth/refresh',
   me: '/v1/auth/me',
-  logout: '/v1/auth/logout'
+  logout: '/v1/auth/logout',
+  user: 'v1/users'
 }
 
 export const authTokens = {
   accessToken: '',
   refreshToken: ''
 }
+
+export const firstUserData = {
+  firstName: 'Test',
+  lastName: 'Test again',
+  email: 'test@test.com',
+  role: 'qa'
+}
+
+export const secondUserData = {
+  firstName: 'Second Test',
+  lastName: 'Another Test',
+  email: 'test2@test.com',
+  role: 'developer'
+}
+
