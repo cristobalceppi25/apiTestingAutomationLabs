@@ -11,3 +11,24 @@ export interface ValidationErrorResponse {
     details: ValidationDetail[];
   };
 }
+
+export interface User {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+}
+
+export interface Pagination {
+  page: number;
+  pageSize: number;
+  totalItems: number;
+  totalPages: number;
+  hasNext: boolean;
+  hasPrev: boolean
+}
+export interface UsersResponse {
+  data: User[],
+  pagination: Pagination
+}
