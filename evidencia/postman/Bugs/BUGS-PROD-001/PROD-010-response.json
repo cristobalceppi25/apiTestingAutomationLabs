@@ -1,0 +1,16 @@
+{
+    "data": {
+        "id": 61,
+        "name": "Mouse inalámbrico",
+        "price": -10,
+        "category": "Mouse",
+        "stock": "25",
+        "createdAt": "2026-11-17T21:48:18+00:00"
+    },
+    "meta": {
+        "requestId": "req_283187dba6af9481",
+        "responseTimeMs": 0.23,
+        "timestamp": "2026-11-17T21:48:18+00:00",
+        "apiVersion": "1.0.0"
+    }
+}
