@@ -1,9 +1,12 @@
-import { test, expect, request } from '@playwright/test'
-import { userLoginData, apiFinalUrl, userRegisterData, authTokens } from '../../test_data/auth.data'
-import type { ValidationErrorResponse } from '../../test_data/auth.types'
+import { test, expect } from '@playwright/test'
+import { userLoginData, userRegisterData, authTokens } from '../../test_data/auth.data'
+import { apiUrls } from '../../config/api.urls'
+import type { ValidationErrorResponse } from '../../types/common/validationError.types'
+
+
 test('AUTH-001 - Login con credenciales válidas', async ({ request }) => {
 
-  const response = await request.post(apiFinalUrl.login, {
+  const response = await request.post(apiUrls.auth.login, {
     data: {
       email: userLoginData.email,
       password: userLoginData.password
@@ -11,8 +14,6 @@ test('AUTH-001 - Login con credenciales válidas', async ({ request }) => {
   });
 
   const jsonData = await response.json()
-
-
 
   expect(response.status()).toBe(200)
 
@@ -29,7 +30,7 @@ test('AUTH-001 - Login con credenciales válidas', async ({ request }) => {
 })
 
 test('AUTH-002 - Login con email inexistente', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.login, {
+  const response = await request.post(apiUrls.auth.login, {
     data: {
       email: 'no.existe@example.com',
       password: userLoginData.password
@@ -44,7 +45,7 @@ test('AUTH-002 - Login con email inexistente', async ({ request }) => {
 })
 
 test('AUTH-003 - Login sin email', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.login, {
+  const response = await request.post(apiUrls.auth.login, {
     data: {
       password: userLoginData.password
     }
@@ -67,7 +68,7 @@ test('AUTH-003 - Login sin email', async ({ request }) => {
 })
 
 test('AUTH-004 - Login sin contraseña', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.login, {
+  const response = await request.post(apiUrls.auth.login, {
     data: {
       email: userLoginData.email
     }
@@ -91,7 +92,7 @@ test('AUTH-004 - Login sin contraseña', async ({ request }) => {
 
 
 test('AUTH-005 - Login con body vacío', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.login, {
+  const response = await request.post(apiUrls.auth.login, {
     data: {
 
     }
@@ -121,7 +122,7 @@ test('AUTH-005 - Login con body vacío', async ({ request }) => {
 })
 
 test('AUTH-006 - Registro con credenciales válidos', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.register, {
+  const response = await request.post(apiUrls.auth.register, {
     data: {
       name: userRegisterData.name,
       email: userRegisterData.email,
@@ -151,7 +152,7 @@ test('AUTH-006 - Registro con credenciales válidos', async ({ request }) => {
 })
 
 test('AUTH-007 - Registro con formato de email incorrecto', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.register, {
+  const response = await request.post(apiUrls.auth.register, {
     data: {
       name: userRegisterData.name,
       email: 'new.user@',
@@ -176,7 +177,7 @@ test('AUTH-007 - Registro con formato de email incorrecto', async ({ request }) 
 })
 
 test('AUTH-008 - Registro de usuario sin ingresar nombre', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.register, {
+  const response = await request.post(apiUrls.auth.register, {
     data: {
       email: userRegisterData.email,
       password: userRegisterData.password
@@ -200,7 +201,7 @@ test('AUTH-008 - Registro de usuario sin ingresar nombre', async ({ request }) =
 })
 
 test('AUTH-009 - Registro de usuario sin el email', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.register, {
+  const response = await request.post(apiUrls.auth.register, {
     data: {
       name: userRegisterData.name,
       password: userRegisterData.password
@@ -225,7 +226,7 @@ test('AUTH-009 - Registro de usuario sin el email', async ({ request }) => {
 
 
 test('AUTH-010 - Registro de usuario sin la contraseña', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.register, {
+  const response = await request.post(apiUrls.auth.register, {
     data: {
       name: userRegisterData.name,
       email: userRegisterData.email
@@ -249,7 +250,7 @@ test('AUTH-010 - Registro de usuario sin la contraseña', async ({ request }) =>
 })
 
 test('AUTH-011 - Renovar el token con un refreshToken válido', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.refresh, {
+  const response = await request.post(apiUrls.auth.refresh, {
     data: {
       refreshToken: authTokens.refreshToken
     }
@@ -269,7 +270,7 @@ test('AUTH-011 - Renovar el token con un refreshToken válido', async ({ request
 })
 
 test('AUTH-012 - Renovar el token con un refreshToken inválido', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.refresh, {
+  const response = await request.post(apiUrls.auth.refresh, {
     data: {
       refreshToken: "test"
     }
@@ -286,7 +287,7 @@ test('AUTH-012 - Renovar el token con un refreshToken inválido', async ({ reque
 })
 
 test('AUTH-013 - Renovar token sin proporcionar refreshToken', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.refresh, {
+  const response = await request.post(apiUrls.auth.refresh, {
     data: {
 
     }
@@ -302,7 +303,7 @@ test('AUTH-013 - Renovar token sin proporcionar refreshToken', async ({ request 
 })
 
 test('AUTH-014 - Ver tu usuario de manera exitosa', async ({ request }) => {
-  const response = await request.get(apiFinalUrl.me, {
+  const response = await request.get(apiUrls.auth.me, {
     headers: {
       Authorization: `Bearer ${authTokens.accessToken}`
     }
@@ -315,7 +316,7 @@ test('AUTH-014 - Ver tu usuario de manera exitosa', async ({ request }) => {
 })
 
 test('AUTH-015 - No ingresar el bearer token', async ({ request }) => {
-  const response = await request.get(apiFinalUrl.me, {
+  const response = await request.get(apiUrls.auth.me, {
 
   })
 
@@ -329,7 +330,7 @@ test('AUTH-015 - No ingresar el bearer token', async ({ request }) => {
 
 
 test('AUTH-016 - Poder desconectar de forma correcta la cuenta', async ({ request }) => {
-  const response = await request.post(apiFinalUrl.logout, {
+  const response = await request.post(apiUrls.auth.logout, {
     data: {
 
     }

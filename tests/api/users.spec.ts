@@ -1,10 +1,12 @@
 import { test, expect, request } from '@playwright/test'
-import { firstUserData, secondUserData, apiFinalUrl, userRegisterData } from '../../test_data/auth.data'
-import type { UsersResponse, ValidationErrorResponse } from '../../test_data/auth.types'
+import { apiUrls } from '../../config/api.urls'
+import { firstUserData, secondUserData } from '../../test_data/user.data'
+import type { UsersResponse } from '../../types/users.types'
+import type { ValidationErrorResponse } from '../../types/common/validationError.types'
 
 test('USERS-001 - Mostrar los usuarios de la primera página', async ({ request }) => {
 
-  const response = await request.get(apiFinalUrl.user, {
+  const response = await request.get(apiUrls.users.base, {
     params: {
       page: 1
     }
@@ -33,7 +35,7 @@ test('USERS-001 - Mostrar los usuarios de la primera página', async ({ request 
 
 test('USERS-002 - Mostrar los usuarios de la segunda página', async ({ request }) => {
 
-  const response = await request.get(apiFinalUrl.user, {
+  const response = await request.get(apiUrls.users.base, {
     params: {
       page: 2
     }
@@ -50,7 +52,7 @@ test('USERS-002 - Mostrar los usuarios de la segunda página', async ({ request 
 
 test('USERS-003 - Colocar una letra en la query y ver que entrega', async ({ request }) => {
 
-  const response = await request.get(apiFinalUrl.user, {
+  const response = await request.get(apiUrls.users.base, {
     params: {
       page: "a"
     }
@@ -68,7 +70,7 @@ test('USERS-003 - Colocar una letra en la query y ver que entrega', async ({ req
 
 test('USERS-004 - Mostrar solo los primeros 6 usuarios', async ({ request }) => {
 
-  const response = await request.get(apiFinalUrl.user, {
+  const response = await request.get(apiUrls.users.base, {
     params: {
       limit: 6
     }
@@ -84,7 +86,7 @@ test('USERS-004 - Mostrar solo los primeros 6 usuarios', async ({ request }) => 
 
 test('USERS-005 - Mostrar a los usuarios de la tercera página con 5 usuarios por página', async ({ request }) => {
 
-  const response = await request.get(apiFinalUrl.user, {
+  const response = await request.get(apiUrls.users.base, {
     params: {
       page: 3,
       limit: 5
@@ -104,7 +106,7 @@ test('USERS-005 - Mostrar a los usuarios de la tercera página con 5 usuarios po
 
 test('USERS-006 - Ordenar los usuarios por orden alfabético del nombre', async ({ request }) => {
 
-  const response = await request.get(apiFinalUrl.user, {
+  const response = await request.get(apiUrls.users.base, {
     params: {
       sort: "firstName",
       order: "asc"
@@ -123,7 +125,7 @@ test('USERS-006 - Ordenar los usuarios por orden alfabético del nombre', async 
 
 test('USERS-007 - Mostrar los datos del usuario con id 1', async ({ request }) => {
 
-  const response = await request.get(`${apiFinalUrl.user}/1`);
+  const response = await request.get(`${apiUrls.users.base}/1`);
 
   const jsonData = await response.json()
 
@@ -139,7 +141,7 @@ test('USERS-007 - Mostrar los datos del usuario con id 1', async ({ request }) =
 
 test('USERS-008  - Mostrar los datos del usuario con id 100', async ({ request }) => {
 
-  const response = await request.get(`${apiFinalUrl.user}/100`);
+  const response = await request.get(`${apiUrls.users.base}/100`);
 
   const jsonData = await response.json()
 
@@ -153,7 +155,7 @@ test('USERS-008  - Mostrar los datos del usuario con id 100', async ({ request }
 
 test('USERS-009 -  Crear de manera exitosa un nuevo usuario', async ({ request }) => {
 
-  const response = await request.post(apiFinalUrl.user, {
+  const response = await request.post(apiUrls.users.base, {
     data: {
       firstName: firstUserData.firstName,
       lastName: firstUserData.lastName,
@@ -176,7 +178,7 @@ test('USERS-009 -  Crear de manera exitosa un nuevo usuario', async ({ request }
 
 test('USERS-010 - Creación de usuario sin nombre', async ({ request }) => {
 
-  const response = await request.post(apiFinalUrl.user, {
+  const response = await request.post(apiUrls.users.base, {
     data: {
       lastName: firstUserData.lastName,
       email: firstUserData.email,
@@ -202,7 +204,7 @@ test('USERS-010 - Creación de usuario sin nombre', async ({ request }) => {
 
 test('USERS-011 - Creación de usuario sin apellido', async ({ request }) => {
 
-  const response = await request.post(apiFinalUrl.user, {
+  const response = await request.post(apiUrls.users.base, {
     data: {
       firstName: firstUserData.firstName,
       email: firstUserData.email,
@@ -228,7 +230,7 @@ test('USERS-011 - Creación de usuario sin apellido', async ({ request }) => {
 
 test('USERS-012  - Creación de usuario sin email', async ({ request }) => {
 
-  const response = await request.post(apiFinalUrl.user, {
+  const response = await request.post(apiUrls.users.base, {
     data: {
       firstName: firstUserData.firstName,
       lastName: firstUserData.lastName,
@@ -255,7 +257,7 @@ test('USERS-012  - Creación de usuario sin email', async ({ request }) => {
 
 test('USERS-013 - Creación de usuario con el body vacío', async ({ request }) => {
 
-  const response = await request.post(apiFinalUrl.user, {
+  const response = await request.post(apiUrls.users.base, {
     data: {
 
     }
@@ -293,7 +295,7 @@ test('USERS-013 - Creación de usuario con el body vacío', async ({ request }) 
 
 test('USERS-014 - Actualizar todos los campos del usuario', async ({ request }) => {
 
-  const response = await request.put(`${apiFinalUrl.user}/1`, {
+  const response = await request.put(`${apiUrls.users.base}/1`, {
     data: {
       firstName: secondUserData.firstName,
       lastName: secondUserData.lastName,
@@ -314,7 +316,7 @@ test('USERS-014 - Actualizar todos los campos del usuario', async ({ request }) 
 
 test('USERS-015 - Actualizar solo el campo del nombre del usuario', async ({ request }) => {
 
-  const response = await request.patch(`${apiFinalUrl.user}/1`, {
+  const response = await request.patch(`${apiUrls.users.base}/1`, {
     data: {
       firstName: secondUserData.firstName
     }
@@ -331,7 +333,7 @@ test('USERS-015 - Actualizar solo el campo del nombre del usuario', async ({ req
 
 test('USERS-016 - Actualizar solo el campo del apellido del usuario', async ({ request }) => {
 
-  const response = await request.patch(`${apiFinalUrl.user}/1`, {
+  const response = await request.patch(`${apiUrls.users.base}/1`, {
     data: {
       lastName: secondUserData.lastName
     }
@@ -347,7 +349,7 @@ test('USERS-016 - Actualizar solo el campo del apellido del usuario', async ({ r
 
 test('USERS-017 - Actualizar solo el campo del email del usuario', async ({ request }) => {
 
-  const response = await request.patch(`${apiFinalUrl.user}/1`, {
+  const response = await request.patch(`${apiUrls.users.base}/1`, {
     data: {
       email: secondUserData.email
     }
@@ -363,7 +365,7 @@ test('USERS-017 - Actualizar solo el campo del email del usuario', async ({ requ
 
 test('USERS-018 - Actualizar solo el campo del rol del usuario', async ({ request }) => {
 
-  const response = await request.patch(`${apiFinalUrl.user}/1`, {
+  const response = await request.patch(`${apiUrls.users.base}/1`, {
     data: {
       role: secondUserData.role
     }
@@ -379,7 +381,7 @@ test('USERS-018 - Actualizar solo el campo del rol del usuario', async ({ reques
 
 test('USERS-019 - Borrar al usuario con id 1', async ({ request }) => {
 
-  const response = await request.delete(`${apiFinalUrl.user}/1`)
+  const response = await request.delete(`${apiUrls.users.base}/1`)
 
   expect(response.status()).toBe(204)
 
@@ -388,7 +390,7 @@ test('USERS-019 - Borrar al usuario con id 1', async ({ request }) => {
 
 test('USERS-020 - Agregar 2  usuarios al mismo tiempo', async ({ request }) => {
 
-  const response = await request.post(`${apiFinalUrl.user}/bulk`, {
+  const response = await request.post(`${apiUrls.users.base}/bulk`, {
     data: [{
       firstName: firstUserData.firstName,
       lastName: firstUserData.lastName,
