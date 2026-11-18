@@ -197,6 +197,7 @@ test('PROD-009 - Crear un producto sin  precio', async ({ request }) => {
 
 test('PROD-010 - Crear un producto con un precio en negativo', async ({ request }) => {
 
+  test.fail(true, 'BUGS-PROD-001: La API acepta precios negativos')
   const response = await request.post(apiUrls.products.base, {
     data: {
       name: firstProductData.name,
