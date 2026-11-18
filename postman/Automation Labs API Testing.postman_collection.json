@@ -18,7 +18,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200);\r\n});\r\n\r\npm.test(\"La respuesta es JSON\", function () {\r\n    pm.response.to.be.json;\r\n});\r\n\r\npm.test('el email es correcto', function(){\r\n    pm.expect(jsonData.data.user.email).to.be.eql(pm.variables.get(\"email_login\"))\r\n})\r\n\r\npm.test('La respuesta tiene un accessToken', function(){\r\n    pm.expect(jsonData.data).to.have.property('accessToken')\r\n})\r\n\r\npm.test('el accessToken es un string', function(){\r\n    pm.expect(jsonData.data.accessToken).to.be.a(\"string\").and.not.empty\r\n})\r\n\r\npm.test('La respuesta tiene un refreshToken', function(){\r\n    pm.expect(jsonData.data).to.have.property('refreshToken')\r\n})\r\n\r\npm.test('el refreshToken es un string', function(){\r\n    pm.expect(jsonData.data.refreshToken).to.be.a(\"string\").and.not.empty\r\n})\r\n\r\npm.environment.set(\"accessToken\", jsonData.data.accessToken)\r\npm.environment.set(\"refreshToken\", jsonData.data.refreshToken)"
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"Status code is 200\", function () {\r\n    pm.response.to.have.status(200)\r\n});\r\n\r\npm.test(\"La respuesta es JSON\", function () {\r\n    pm.response.to.be.json\r\n});\r\n\r\npm.test('el email es correcto', function(){\r\n    pm.expect(jsonData.data.user.email).to.be.eql(pm.variables.get(\"email_login\"))\r\n})\r\n\r\npm.test('La respuesta tiene un accessToken', function(){\r\n    pm.expect(jsonData.data).to.have.property('accessToken')\r\n})\r\n\r\npm.test('el accessToken es un string', function(){\r\n    pm.expect(jsonData.data.accessToken).to.be.a(\"string\").and.not.empty\r\n})\r\n\r\npm.test('La respuesta tiene un refreshToken', function(){\r\n    pm.expect(jsonData.data).to.have.property('refreshToken')\r\n})\r\n\r\npm.test('el refreshToken es un string', function(){\r\n    pm.expect(jsonData.data.refreshToken).to.be.a(\"string\").and.not.empty\r\n})\r\n\r\npm.environment.set(\"accessToken\", jsonData.data.accessToken)\r\npm.environment.set(\"refreshToken\", jsonData.data.refreshToken)"
                 ]
               }
             }
@@ -314,7 +314,7 @@
               "script": {
                 "type": "text/javascript",
                 "exec": [
-                  "let jsonData = pm.response.json()\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\");\r\n});\r\n\r\n\r\npm.test(\"El email es obligatorio\", () => {\r\n    pm.expect(emailError).to.exist;\r\n    pm.expect(emailError.message).to.eql(\"email is required\");\r\n});"
+                  "let jsonData = pm.response.json()\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\npm.test('status code 422', function() {\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test('Tiene un mensaje de error', function() {\r\n    pm.expect(jsonData).to.have.property('error')\r\n})\r\n\r\npm.test(\"El código de error es VALIDATION_ERROR\", () => {\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\")\r\n});\r\n\r\n\r\npm.test(\"El email es obligatorio\", () => {\r\n    pm.expect(emailError).to.exist\r\n    pm.expect(emailError.message).to.eql(\"email is required\")\r\n});"
                 ]
               }
             }
@@ -510,7 +510,7 @@
               "bearer": [
                 {
                   "key": "token",
-                  "value": "{{accessToken}}",
+                  "value": "{{refreshToken}}",
                   "type": "string"
                 }
               ]
@@ -595,32 +595,1274 @@
           "response": []
         }
       ]
+    },
+    {
+      "name": "02 - Users",
+      "item": [
+        {
+          "name": "USERS-001 - Mostrar los usuarios de la primera página",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"la respuesta es un json\", function(){\r\n    pm.response.to.be.json\r\n})\r\n\r\n\r\npm.test(\"tiene la propiedad data\", function(){\r\n    pm.expect(jsonData).to.have.property(\"data\")\r\n})\r\n\r\npm.test(\"verificar que todos los datos tengan el mismo tipo de dato\", function(){\r\n    jsonData.data.forEach(users =>{\r\n        pm.expect(users.id).to.be.a(\"number\")\r\n        pm.expect(users.firstName).to.be.a(\"string\")\r\n        pm.expect(users.lastName).to.be.a(\"string\")\r\n        pm.expect(users.email).to.be.a(\"string\")\r\n        pm.expect(users.role).to.be.a(\"string\")\r\n    })\r\n})\r\n\r\npm.test(\"verificar que estoy realmente en la primera página\", function(){\r\n    pm.expect(jsonData.pagination.hasPrev).to.be.false\r\n    pm.expect(jsonData.pagination.page).to.eql(1)\r\n    pm.expect(jsonData.data).to.have.length(10)\r\n    pm.expect(jsonData.pagination.pageSize).to.eql(10)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}?page=1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-002 - Mostrar los usuarios de la segunda página",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test(\"verificar que estoy en la segunda página\", function(){\r\n    pm.expect(jsonData.pagination.page).to.eql(2)\r\n    pm.expect(jsonData.data[0].id).to.eql(11)\r\n    pm.expect(jsonData.pagination.hasPrev).to.eql(true)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}?page=2",
+              "host": [
+                "{{url_users}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "2"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-003 - Colocar una letra en la query y ver que entrega",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test(\"los usuarios vistos son de la primera página\", function(){\r\n    pm.expect(jsonData.pagination.hasPrev).to.be.false\r\n    pm.expect(jsonData.pagination.page).to.eql(1)\r\n    pm.expect(jsonData.data).to.have.length(10)\r\n    pm.expect(jsonData.pagination.pageSize).to.eql(10)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}?page=a",
+              "host": [
+                "{{url_users}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "a"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-004 - Mostrar solo los primeros 6 usuarios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"comprobar que realmente solo se muestran 6 usuarios\", function(){\r\n    pm.expect(jsonData.data).to.have.length(6)\r\n    pm.expect(jsonData.pagination.pageSize).to.eql(6)\r\n})\r\n\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}?limit=6",
+              "host": [
+                "{{url_users}}"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "6"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-005 - Mostrar a los usuarios de la tercera página con 5 usuarios por página",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"comprobar que realmente se muestran 5 usuarios por página\", function(){\r\n    pm.expect(jsonData.data).to.have.length(5)\r\n    pm.expect(jsonData.pagination.pageSize).to.eql(5)\r\n})\r\n\r\npm.test(\"comprobar que estoy realmente en la página 3\", function(){\r\n    pm.expect(jsonData.pagination.page).to.eql(3)\r\n    pm.expect(jsonData.pagination.hasPrev).to.eql(true)\r\n    pm.expect(jsonData.pagination.hasNext).to.eql(true)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}?page=3&limit=5",
+              "host": [
+                "{{url_users}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "3"
+                },
+                {
+                  "key": "limit",
+                  "value": "5"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-006 - Ordenar los usuarios por orden alfabético del nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test(\"comprobar que realmente los usuarios están ordenador por su primer nombre\", function(){\r\n   const names = jsonData.data.map(users => users.firstName)\r\n\r\n   const sortedNames = [...names].sort((a,b) => a.localeCompare(b))\r\n\r\n   pm.expect(names).to.eql(sortedNames)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}?sort=firstName&order=asc",
+              "host": [
+                "{{url_users}}"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "firstName"
+                },
+                {
+                  "key": "order",
+                  "value": "asc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-007 - Mostrar los datos del usuario con id 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test(\"comprobar que la respuesta es un json\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que el usuario mostrado tiene id 1\", function(){\r\n    pm.expect(jsonData.data.id).to.eql(1)\r\n})\r\n\r\npm.test(\"comprobar los tipos de datos del usuario\", function(){\r\n    pm.expect(jsonData.data.id).to.be.a(\"number\")\r\n    pm.expect(jsonData.data.firstName).to.be.a(\"string\")\r\n    pm.expect(jsonData.data.lastName).to.be.a(\"string\")\r\n    pm.expect(jsonData.data.email).to.be.a(\"string\")\r\n    pm.expect(jsonData.data.role).to.be.a(\"string\")\r\n})\r\n\r\n\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}/1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-008  - Mostrar los datos del usuario con id 100",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\n\r\npm.test(\"status code 404\", function(){\r\n    pm.response.to.have.status(404)\r\n})\r\n\r\npm.test(\"que exista un propiedad de error en el json\", function(){\r\n    pm.expect(jsonData).to.have.property(\"error\")\r\n})\r\n\r\npm.test(\"tenga un mensaje en el código del error\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"NOT_FOUND\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}/100",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "100"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-009 -  Crear de manera exitosa un nuevo usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status 201\", function(){\r\n    pm.response.to.have.status(201)\r\n})\r\n\r\npm.test(\"la respuesta es un json no vacío\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"confirmar que los datos ingresados son correctos\", function(){\r\n    pm.expect(jsonData.data.firstName).to.be.eql(pm.variables.get(\"user_firstName\"))\r\n    pm.expect(jsonData.data.lastName).to.be.eql(pm.variables.get(\"user_lastName\"))\r\n    pm.expect(jsonData.data.email).to.be.eql(pm.variables.get(\"user_email\"))\r\n    pm.expect(jsonData.data.role).to.be.eql(pm.variables.get(\"user_role\"))\r\n})\r\n\r\npm.test(\"el usuario tiene un ID válido\", function(){\r\n    pm.expect(jsonData.data.id).to.be.a(\"number\");\r\n    pm.expect(jsonData.data.id).to.be.above(0);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{user_firstName}}\",\r\n  \"lastName\": \"{{user_lastName}}\",\r\n  \"email\": \"{{user_email}}\",\r\n  \"role\": \"{{user_role}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}",
+              "host": [
+                "{{url_users}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-010 - Creación de usuario sin nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst firstNameError = jsonData.error.details.find(\r\n    detail => detail.field === \"firstName\"\r\n);\r\n\r\npm.test(\"status 422\", function(){\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test(\"la repsuesta contiene un mensaje de error\", function(){\r\n    pm.expect(jsonData).to.have.property(\"error\")\r\n})\r\n\r\npm.test(\"el mensaje de error contiene un mensaje con el código del error\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del nombre\", function(){\r\n    pm.expect(firstNameError).to.exist\r\n    pm.expect(firstNameError.message).to.eql(\"firstName is required\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"lastName\": \"{{user_lastName}}\",\r\n  \"email\": \"{{user_email}}\",\r\n  \"role\": \"{{user_role}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}",
+              "host": [
+                "{{url_users}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-011 - Creación de usuario sin apellido",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst lastNameError = jsonData.error.details.find(\r\n    detail => detail.field === \"lastName\"\r\n);\r\n\r\npm.test(\"status 422\", function(){\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test(\"la repsuesta contiene un mensaje de error\", function(){\r\n    pm.expect(jsonData).to.have.property(\"error\")\r\n})\r\n\r\npm.test(\"el mensaje de error contiene un mensaje con el código del error\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del apellido\", function(){\r\n    pm.expect(lastNameError).to.exist\r\n    pm.expect(lastNameError.message).to.eql(\"lastName is required\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{user_firstName}}\",\r\n  \"email\": \"{{user_email}}\",\r\n  \"role\": \"{{user_role}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}",
+              "host": [
+                "{{url_users}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-012  - Creación de usuario sin email",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\npm.test(\"status 422\", function(){\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test(\"la repsuesta contiene un mensaje de error\", function(){\r\n    pm.expect(jsonData).to.have.property(\"error\")\r\n})\r\n\r\npm.test(\"el mensaje de error contiene un mensaje con el código del error\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del email\", function(){\r\n    pm.expect(emailError).to.exist\r\n    pm.expect(emailError.message).to.eql(\"email is required\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{user_firstName}}\",\r\n  \"lastName\": \"{{user_lastName}}\",\r\n  \"role\": \"{{user_role}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}",
+              "host": [
+                "{{url_users}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-013 - Creación de usuario con el body vacío",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst firstNameError = jsonData.error.details.find(\r\n    detail => detail.field === \"firstName\"\r\n);\r\n\r\nconst lastNameError = jsonData.error.details.find(\r\n    detail => detail.field === \"lastName\"\r\n);\r\n\r\nconst emailError = jsonData.error.details.find(\r\n    detail => detail.field === \"email\"\r\n);\r\n\r\npm.test(\"status 422\", function(){\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test(\"la repsuesta contiene un mensaje de error\", function(){\r\n    pm.expect(jsonData).to.have.property(\"error\")\r\n})\r\n\r\npm.test(\"el mensaje de error contiene un mensaje con el código del error\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del nombre\", function(){\r\n    pm.expect(firstNameError).to.exist\r\n    pm.expect(firstNameError.message).to.eql(\"firstName is required\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del apellido\", function(){\r\n    pm.expect(lastNameError).to.exist\r\n    pm.expect(lastNameError.message).to.eql(\"lastName is required\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del email\", function(){\r\n    pm.expect(emailError).to.exist\r\n    pm.expect(emailError.message).to.eql(\"email is required\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}",
+              "host": [
+                "{{url_users}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-014 - Actualizar todos los campos del usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que los datos realmente fueron cambiados\", function(){\r\n    pm.expect(jsonData.data.firstName).to.eql(pm.variables.get(\"user2_firstName\"))\r\n    pm.expect(jsonData.data.lastName).to.eql(pm.variables.get(\"user2_lastName\"))\r\n    pm.expect(jsonData.data.email).to.eql(pm.variables.get(\"user2_email\"))\r\n    pm.expect(jsonData.data.role).to.eql(pm.variables.get(\"user2_role\"))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{user2_firstName}}\",\r\n  \"lastName\": \"{{user2_lastName}}\",\r\n  \"email\": \"{{user2_email}}\",\r\n  \"role\": \"{{user2_role}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}/1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-015 - Actualizar solo el campo del nombre del usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que solo el nombre realmente fue cambiado\", function(){\r\n    pm.expect(jsonData.data.firstName).to.not.be.eql(pm.environment.get(\"user_firstName_fixed\"))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"firstName\": \"{{user2_firstName}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}/1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-016 - Actualizar solo el campo del apellido del usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que solo el apellido realmente fue cambiado\", function(){\r\n    pm.expect(jsonData.data.lastName).to.not.be.eql(pm.environment.get(\"user_lastName_fixed\"))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"lastName\": \"{{user2_lastName}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}/1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-017 - Actualizar solo el campo del email del usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que solo el email realmente fue cambiado\", function(){\r\n    pm.expect(jsonData.data.email).to.not.be.eql(pm.environment.get(\"user_email_fixed\"))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"email\": \"{{user2_email}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}/1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-018 - Actualizar solo el campo del rol del usuario",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que solo el rol realmente fue cambiado\", function(){\r\n    pm.expect(jsonData.data.role).to.not.be.eql(pm.environment.get(\"user_role_fixed\"))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"role\": \"{{user2_role}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}/1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-019 - Borrar al usuario con id 1",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status code 204\", function(){\r\n    pm.response.to.have.status(204)\r\n})\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url_users}}/1",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "1"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "USERS-020 - Agregar 2  usuarios al mismo tiempo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 201\", function(){\r\n    pm.response.to.have.status(201)\r\n})\r\n\r\n\r\npm.test(\"confirmar que los datos del primer usuario son correctos\", function(){\r\n    pm.expect(jsonData.data[0].firstName).to.be.eql(pm.variables.get(\"user_firstName\"))\r\n    pm.expect(jsonData.data[0].lastName).to.be.eql(pm.variables.get(\"user_lastName\"))\r\n    pm.expect(jsonData.data[0].email).to.be.eql(pm.variables.get(\"user_email\"))\r\n    pm.expect(jsonData.data[0].role).to.be.eql(pm.variables.get(\"user_role\"))\r\n})\r\n\r\npm.test(\"confirmar que los datos del segundo usuario son correctos\", function(){\r\n    pm.expect(jsonData.data[1].firstName).to.be.eql(pm.variables.get(\"user2_firstName\"))\r\n    pm.expect(jsonData.data[1].lastName).to.be.eql(pm.variables.get(\"user2_lastName\"))\r\n    pm.expect(jsonData.data[1].email).to.be.eql(pm.variables.get(\"user2_email\"))\r\n    pm.expect(jsonData.data[1].role).to.be.eql(pm.variables.get(\"user2_role\"))\r\n})\r\n\r\npm.test(\"los usuarios tienen IDs diferentes\", function(){\r\n    pm.expect(jsonData.data[0].id).to.be.a(\"number\");\r\n    pm.expect(jsonData.data[1].id).to.be.a(\"number\");\r\n\r\n    pm.expect(jsonData.data[0].id)\r\n        .to.not.eql(jsonData.data[1].id);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"items\": [\r\n    {\r\n      \"firstName\": \"{{user_firstName}}\",\r\n      \"lastName\": \"{{user_lastName}}\",\r\n      \"email\": \"{{user_email}}\",\r\n      \"role\": \"{{user_role}}\"\r\n    },\r\n    {\r\n      \"firstName\": \"{{user2_firstName}}\",\r\n      \"lastName\": \"{{user2_lastName}}\",\r\n      \"email\": \"{{user2_email}}\",\r\n      \"role\": \"{{user2_role}}\"\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_users}}/bulk",
+              "host": [
+                "{{url_users}}"
+              ],
+              "path": [
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
+    },
+    {
+      "name": "03 - Products",
+      "item": [
+        {
+          "name": "PROD-001 - Mostrar los productos de la primera página",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"la respuesta es un json\", function(){\r\n    pm.response.to.be.json\r\n})\r\n\r\n\r\npm.test(\"tiene la propiedad data\", function(){\r\n    pm.expect(jsonData).to.have.property(\"data\")\r\n})\r\n\r\npm.test(\"verificar que todos los datos tengan el mismo tipo de dato\", function(){\r\n    jsonData.data.forEach(prod =>{\r\n        pm.expect(prod.id).to.be.a(\"number\")\r\n        pm.expect(prod.name).to.be.a(\"string\")\r\n        pm.expect(prod.price).to.be.a(\"number\")\r\n        pm.expect(prod.category).to.be.a(\"string\")\r\n        pm.expect(prod.stock).to.be.a(\"number\")\r\n    })\r\n})\r\n\r\npm.test(\"verificar que estoy realmente en la primera página\", function(){\r\n    pm.expect(jsonData.pagination.hasPrev).to.be.false\r\n    pm.expect(jsonData.pagination.page).to.eql(1)\r\n    pm.expect(jsonData.data).to.have.length(10)\r\n    pm.expect(jsonData.pagination.pageSize).to.eql(10)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_products}}?page=1",
+              "host": [
+                "{{url_products}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "1"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-002 - Mostrar los productos de la tercera página",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test(\"verificar que estoy en la segunda página\", function(){\r\n    pm.expect(jsonData.pagination.page).to.eql(3)\r\n    pm.expect(jsonData.data[0].id).to.eql(21)\r\n    pm.expect(jsonData.pagination.hasPrev).to.eql(true)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_products}}?page=3",
+              "host": [
+                "{{url_products}}"
+              ],
+              "query": [
+                {
+                  "key": "page",
+                  "value": "3"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-003 - Mostrar solo 4 productos",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"comprobar que se muestran solo 4 productos\", function(){\r\n    pm.expect(jsonData.data).to.have.length(4)\r\n    pm.expect(jsonData.pagination.pageSize).to.eql(4)\r\n})\r\n\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_products}}?limit=4",
+              "host": [
+                "{{url_products}}"
+              ],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "4"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-004 - Mostrar los productos en base al stock que tienen de forma descendente",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function() {\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test(\"comprobar que el stock de los productos realmente está ordenado de forma descendente\", function(){\r\n   const products = jsonData.data.map(prod => prod.stock)\r\n\r\n   const sortedStockProducts = [...products].sort((a,b) => b - a)\r\n\r\n   pm.expect(products).to.eql(sortedStockProducts)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_products}}?sort=stock&order=desc",
+              "host": [
+                "{{url_products}}"
+              ],
+              "query": [
+                {
+                  "key": "sort",
+                  "value": "stock"
+                },
+                {
+                  "key": "order",
+                  "value": "desc"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-005 - Mostrar los datos del producto buscado",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\n\npm.test(\"status code 200\", function() {\n    pm.response.to.have.status(200)\n})\n\n\npm.test(\"comprobar que realmente aparece el producto que buscamos\", function(){\n   pm.expect(jsonData.data.some(product => product.name === \"Comet Power Bank C\")).to.be.true\n})\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_products}}?q=Comet Power Bank C",
+              "host": [
+                "{{url_products}}"
+              ],
+              "query": [
+                {
+                  "key": "q",
+                  "value": "Comet Power Bank C"
+                }
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-006 - Ver los datos del producto con id 5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\n\r\npm.test(\"comprobar que la respuesta es un json\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que el usuario mostrado tiene id 5\", function(){\r\n    pm.expect(jsonData.data.id).to.eql(5)\r\n})\r\n\r\npm.test(\"comprobar los tipos de datos del usuario\", function(){\r\n    pm.expect(jsonData.data.id).to.be.a(\"number\")\r\n    pm.expect(jsonData.data.name).to.be.a(\"string\")\r\n    pm.expect(jsonData.data.price).to.be.a(\"number\")\r\n    pm.expect(jsonData.data.category).to.be.a(\"string\")\r\n    pm.expect(jsonData.data.stock).to.be.a(\"number\")\r\n})\r\n\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{url_products}}/5",
+              "host": [
+                "{{url_products}}"
+              ],
+              "path": [
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-007 - Crear  un nuevo producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status 201\", function(){\r\n    pm.response.to.have.status(201)\r\n})\r\n\r\npm.test(\"la respuesta es un json no vacío\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"confirmar que los datos ingresados son correctos\", function(){\r\n    pm.expect(jsonData.data.name).to.be.eql(pm.variables.get(\"product1_name\"))\r\n    pm.expect(jsonData.data.price).to.be.eql(Number(pm.variables.get(\"product1_price\")))\r\n    pm.expect(jsonData.data.category).to.be.eql(pm.variables.get(\"product1_category\"))\r\n    pm.expect(jsonData.data.stock).to.be.eql(Number(pm.variables.get(\"product1_stock\")))\r\n})\r\n\r\npm.test(\"el producto tiene un ID válido\", function(){\r\n    pm.expect(jsonData.data.id).to.be.a(\"number\");\r\n    pm.expect(jsonData.data.id).to.be.above(0);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{product1_name}}\",\r\n  \"price\": {{product1_price}},\r\n  \"category\": \"{{product1_category}}\",\r\n  \"stock\": {{product1_stock}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}",
+              "host": [
+                "{{url_products}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-008 - Crear un producto sin nombre",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst productNameError = jsonData.error.details.find(\r\n    detail => detail.field === \"name\"\r\n);\r\n\r\npm.test(\"status 422\", function(){\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test(\"la repsuesta contiene un mensaje de error\", function(){\r\n    pm.expect(jsonData).to.have.property(\"error\")\r\n})\r\n\r\npm.test(\"el mensaje de error contiene un mensaje con el código del error\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del nombre\", function(){\r\n    pm.expect(productNameError).to.exist\r\n    pm.expect(productNameError.message).to.eql(\"name is required\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"price\": {{product1_price}},\r\n  \"category\": \"{{product1_category}}\",\r\n  \"stock\": {{product1_stock}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}",
+              "host": [
+                "{{url_products}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-009 - Crear un producto sin  precio",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\nconst productPriceError = jsonData.error.details.find(\r\n    detail => detail.field === \"price\"\r\n);\r\n\r\npm.test(\"status 422\", function(){\r\n    pm.response.to.have.status(422)\r\n})\r\n\r\npm.test(\"la repsuesta contiene un mensaje de error\", function(){\r\n    pm.expect(jsonData).to.have.property(\"error\")\r\n})\r\n\r\npm.test(\"el mensaje de error contiene un mensaje con el código del error\", function(){\r\n    pm.expect(jsonData.error.code).to.eql(\"VALIDATION_ERROR\")\r\n})\r\n\r\npm.test(\"comprobar que el detalle del error realmente sea del nombre\", function(){\r\n    pm.expect(productPriceError).to.exist\r\n    pm.expect(productPriceError.message).to.eql(\"price is required\")\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{product1_name}}\",\r\n  \"category\": \"{{product1_category}}\",\r\n  \"stock\": {{product1_stock}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}",
+              "host": [
+                "{{url_products}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-010 - Crear un producto con un precio en negativo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"confirmar que el precio ingresado realmente es negativo\", function(){\r\n    pm.expect(jsonData.data.price).to.be.lessThan(0)\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{product1_name}}\",\r\n  \"price\": -10,\r\n  \"category\": \"{{product1_category}}\",\r\n  \"stock\": \"{{product1_stock}}\"\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}",
+              "host": [
+                "{{url_products}}"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-011 - Actualizar todos los datos que son obligatorios",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que los datos realmente fueron cambiados\", function(){\r\n    pm.expect(jsonData.data.name).to.eql(pm.variables.get(\"product2_name\"))\r\n    pm.expect(jsonData.data.price).to.be.eql(Number(pm.variables.get(\"product2_price\")))\r\n    pm.expect(jsonData.data.category).to.eql(pm.variables.get(\"product2_category\"))\r\n    pm.expect(jsonData.data.stock).to.eql(Number(pm.variables.get(\"product2_stock\")))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{product2_name}}\",\r\n  \"price\": {{product2_price}},\r\n  \"category\": \"{{product2_category}}\",\r\n  \"stock\": {{product2_stock}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}/5",
+              "host": [
+                "{{url_products}}"
+              ],
+              "path": [
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-012 - Actualizar solo el nombre del producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que el nombre del producto realmente fue cambiado\", function(){\r\n    pm.expect(jsonData.data.name).to.not.be.eql(pm.environment.get(\"product2_name\"))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"name\": \"{{product2_name}}\"\r\n  \r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}/5",
+              "host": [
+                "{{url_products}}"
+              ],
+              "path": [
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-013 - Actualizar solo el precio del producto",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 200\", function(){\r\n    pm.response.to.have.status(200)\r\n})\r\n\r\npm.test(\"revisar si el json tiene datos\", function(){\r\n    pm.response.to.be.json.and.not.empty\r\n})\r\n\r\npm.test(\"comprobar que el precio del producto realmente fue cambiado\", function(){\r\n    pm.expect(jsonData.data.price).to.not.be.eql(Number(pm.environment.get(\"product2_price\")))\r\n})"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "PATCH",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"price\": {{product2_price}}\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}/5",
+              "host": [
+                "{{url_products}}"
+              ],
+              "path": [
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-014 - Borrar el producto con id 5",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "pm.test(\"status code 204\", function(){\r\n    pm.response.to.have.status(204)\r\n})\r\n"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{url_products}}/5",
+              "host": [
+                "{{url_products}}"
+              ],
+              "path": [
+                "5"
+              ]
+            }
+          },
+          "response": []
+        },
+        {
+          "name": "PROD-015 - Crear 2 productos al mismo tiempo",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "type": "text/javascript",
+                "exec": [
+                  "let jsonData = pm.response.json()\r\n\r\npm.test(\"status code 201\", function(){\r\n    pm.response.to.have.status(201)\r\n})\r\n\r\n\r\npm.test(\"confirmar que los datos del primer producto son correctos\", function(){\r\n    pm.expect(jsonData.data[0].name).to.be.eql(pm.variables.get(\"product1_name\"))\r\n    pm.expect(jsonData.data[0].price).to.be.eql(Number(pm.variables.get(\"product1_price\")))\r\n    pm.expect(jsonData.data[0].category).to.be.eql(pm.variables.get(\"product1_category\"))\r\n    pm.expect(jsonData.data[0].stock).to.be.eql(Number(pm.variables.get(\"product1_stock\")))\r\n})\r\n\r\npm.test(\"confirmar que los datos del segundo producto son correctos\", function(){\r\n    pm.expect(jsonData.data[1].name).to.be.eql(pm.variables.get(\"product2_name\"))\r\n    pm.expect(jsonData.data[1].price).to.be.eql(Number(pm.variables.get(\"product2_price\")))\r\n    pm.expect(jsonData.data[1].category).to.be.eql(pm.variables.get(\"product2_category\"))\r\n    pm.expect(jsonData.data[1].stock).to.be.eql(Number(pm.variables.get(\"product2_stock\")))\r\n})\r\n\r\npm.test(\"los productos tienen IDs diferentes\", function(){\r\n    pm.expect(jsonData.data[0].id).to.be.a(\"number\");\r\n    pm.expect(jsonData.data[1].id).to.be.a(\"number\");\r\n\r\n    pm.expect(jsonData.data[0].id)\r\n        .to.not.eql(jsonData.data[1].id);\r\n});"
+                ]
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\r\n  \"items\": [\r\n    {\r\n      \"name\": \"{{product1_name}}\",\r\n      \"price\": {{product1_price}},\r\n      \"category\": \"{{product1_category}}\",\r\n      \"stock\": {{product1_stock}}\r\n    },\r\n    {\r\n      \"name\": \"{{product2_name}}\",\r\n      \"price\": {{product2_price}},\r\n      \"category\": \"{{product2_category}}\",\r\n      \"stock\": {{product2_stock}}\r\n    }\r\n  ]\r\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{url_products}}/bulk",
+              "host": [
+                "{{url_products}}"
+              ],
+              "path": [
+                "bulk"
+              ]
+            }
+          },
+          "response": []
+        }
+      ]
     }
   ],
   "variable": [
     {
       "key": "url_autentificación",
-      "value": ""
+      "value": "https://api.qaautomationlabs.com/v1/auth"
     },
     {
       "key": "email_login",
-      "value": ""
+      "value": "qa@demo.io"
     },
     {
       "key": "password_login",
-      "value": ""
+      "value": "Password123"
     },
     {
       "key": "name_register",
-      "value": ""
+      "value": "New user "
     },
     {
       "key": "email_register",
-      "value": ""
+      "value": "new.user@example.com"
     },
     {
       "key": "password_register",
-      "value": ""
+      "value": "Password124"
+    },
+    {
+      "key": "url_users",
+      "value": "https://api.qaautomationlabs.com/v1/users"
+    },
+    {
+      "key": "user_firstName",
+      "value": "Test"
+    },
+    {
+      "key": "user_lastName",
+      "value": "Test again"
+    },
+    {
+      "key": "user_email",
+      "value": "test@test.com"
+    },
+    {
+      "key": "user_role",
+      "value": "qa"
+    },
+    {
+      "key": "user2_firstName",
+      "value": "Second Test"
+    },
+    {
+      "key": "user2_lastName",
+      "value": "Another Test"
+    },
+    {
+      "key": "user2_email",
+      "value": "test2@test.com"
+    },
+    {
+      "key": "user2_role",
+      "value": "developer"
+    },
+    {
+      "key": "url_products",
+      "value": "https://api.qaautomationlabs.com/v1/products"
+    },
+    {
+      "key": "product1_name",
+      "value": "Mouse inalámbrico"
+    },
+    {
+      "key": "product1_price",
+      "value": "45.34"
+    },
+    {
+      "key": "product1_category",
+      "value": "Mouse"
+    },
+    {
+      "key": "product1_stock",
+      "value": "25"
+    },
+    {
+      "key": "product2_name",
+      "value": "Teclado inalámbrico"
+    },
+    {
+      "key": "product2_price",
+      "value": "190.44"
+    },
+    {
+      "key": "product2_category",
+      "value": "Teclado"
+    },
+    {
+      "key": "product2_stock",
+      "value": "80"
     }
   ]
 }
